@@ -7,12 +7,15 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 # Compila e gera o arquivo JAR executável ignorando os testes unitários de ambiente
 RUN mvn clean package -DskipTests
+
 # Estágio 2: Imagem de Execução Leve com JRE 17
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+
 # Configuração da Porta dinâmica da Nuvem (Render/Koyeb definem a variável PORT)
 ENV PORT=8080
 EXPOSE 8080
+
 # Inicialização da aplicação Spring Boot
 ENTRYPOINT ["sh", "-c", "java -jar app.jar --server.port=${PORT}"]
